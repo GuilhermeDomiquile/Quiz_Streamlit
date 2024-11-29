@@ -1,0 +1,75 @@
+import streamlit as st
+import pandas as pd
+
+# Configuração inicial da página
+st.set_page_config(page_title="Quiz - Red Dead Redemption", layout="centered")
+
+# Título do Quiz
+st.title("🎮 Quiz - Red Dead Redemption")
+st.write("Teste seus conhecimentos sobre o mundo de **Red Dead Redemption**!")
+
+# Banco de perguntas e respostas
+def load_questions():
+    data = {
+        "Pergunta": [
+            "Quem é o traidor em Red Dead Redemption 2?",
+            "Qual o nome do protagonista de Red Dead Redemption 2?",
+            "Quem mata Hosea Matthews?",
+            '"I have a..."',
+            "Qual é o nome da gangue liderada por Dutch?",
+            "Qual o nome do filho de John Marston?",
+            "Qual é a cidade onde Arthur encontra Tilly e Mary-Beth?",
+            "Qual o nome do cavalo inicial de Arthur Morgan?"
+        ],
+        "Alternativas": [
+            ["A. Dutch van der Linde", "B. Micah Bell", "C. John Marston"],
+            ["A. Arthur Morgan", "B. Hosea Matthews", "C. Jack Marston"],
+            ["A. Leviticus Cornwall", "B. Tacitus Kilgore", "C. Agente Milton"],
+            ["A. PLAN", "B. IDEA", "C. WIFE"],
+            ["A. Gangue dos Lobos", "B. Gangue Van der Linde", "C. Gangue dos Bravos"],
+            ["A. Jack", "B. Micah", "C. Hosea"],
+            ["A. Saint Denis", "B. Valentine", "C. Rhodes"],
+            ["A. Tennessee Walker", "B. Buell", "C. Shire"]
+        ],
+        "Resposta_Correta": ["B", "A", "C", "A", "B", "A", "C", "C"]
+    }
+    return pd.DataFrame(data)
+
+# Carregar as perguntas
+questions_df = load_questions()
+
+# Variáveis de controle
+score = 0
+responses = []
+
+# Loop pelas perguntas
+for index, row in questions_df.iterrows():
+    st.subheader(f"Pergunta {index + 1}")
+    st.write(row["Pergunta"])
+    
+    # Exibir alternativas sem pré-seleção
+    user_answer = st.radio(
+        "Escolha uma alternativa:",
+        options=row["Alternativas"],
+        key=f"question_{index}",
+        index=None  # Garantir que nenhuma alternativa seja pré-selecionada
+    )
+    
+    # Verificar resposta se o usuário escolheu algo
+    if user_answer:
+        user_choice = user_answer.split(".")[0]  # Extrair a letra da resposta
+        responses.append(user_choice)
+        
+        if user_choice == row["Resposta_Correta"]:
+            st.success("✅ Resposta correta!")
+            score += 1
+        else:
+            st.error(f"❌ Resposta errada! A resposta correta é: {row['Resposta_Correta']}")
+
+# Mostrar o resultado final
+if st.button("Finalizar Quiz"):
+    st.subheader("🏁 Resultado Final:")
+    st.write(f"Você acertou **{score}** de **{len(questions_df)}** perguntas!")
+    st.write("Respostas do Quiz:")
+    questions_df["Sua Resposta"] = responses
+    st.write(questions_df[["Pergunta", "Sua Resposta", "Resposta_Correta"]])
